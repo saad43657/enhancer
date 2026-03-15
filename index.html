@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Lumina — AI Photo & Video Enhancer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --white:#ffffff;
+  --bg:#f7f6f3;
+  --bg2:#eeecea;
+  --surface:#ffffff;
+  --border:#e4e2de;
+  --border-dark:#ccc9c3;
+  --text:#1a1916;
+  --text2:#5a574f;
+  --text3:#9b9790;
+  --accent:#7c3aed;
+  --accent2:#6d28d9;
+  --accent-light:#ede9fe;
+  --accent-glow:rgba(124,58,237,0.18);
+  --green:#059669;
+  --red:#dc2626;
+  --orange:#d97706;
+  --radius:14px;
+  --radius-sm:9px;
+  --radius-xs:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.06);
+  --shadow-md:0 2px 8px rgba(0,0,0,.08),0 8px 32px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.1),0 24px 64px rgba(0,0,0,.1);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:200;background:rgba(247,246,243,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);padding:0 40px;}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text);}
+.nav-logo-mark{width:32px;height:32px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 10px var(--accent-glow);}
+.nav-logo-name{font-family:'Bricolage Grotesque',sans-serif;font-size:19px;font-weight:700;letter-spacing:-.4px;}
+.nav-links{display:flex;align-items:center;gap:4px;}
+.nav-link{font-size:14px;font-weight:500;color:var(--text2);padding:7px 13px;border-radius:var(--radius-xs);cursor:pointer;transition:all .18s;text-decoration:none;border:none;background:none;}
+.nav-link:hover,.nav-link.active{color:var(--text);background:var(--bg2);}
+.nav-dropdown{position:relative;}
+.nav-dropdown-menu{position:absolute;top:calc(100%+8px);left:0;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:8px;min-width:240px;display:none;z-index:300;}
+.nav-dropdown:hover .nav-dropdown-menu{display:flex;flex-direction:column;gap:2px;}
+.nd-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--radius-xs);cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .15s;text-decoration:none;}
+.nd-item:hover{background:var(--accent-light);color:var(--accent);}
+.nd-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.btn-ghost{font-size:13px;font-weight:600;padding:8px 16px;border-radius:var(--radius-sm);cursor:pointer;border:1.5px solid var(--border-dark);background:transparent;color:var(--text);transition:all .18s;}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+.btn-primary{font-size:13px;font-weight:600;padding:9px 18px;border-radius:var(--radius-sm);cursor:pointer;border:none;background:var(--accent);color:#fff;transition:all .18s;box-shadow:0 2px 8px var(--accent-glow);}
+.btn-primary:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 16px var(--accent-glow);}
+
+/* ── HERO ── */
+.hero{padding:72px 40px 60px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(124,58,237,.07) 0%,transparent 70%);pointer-events:none;}
+.hero-inner{max-width:1100px;margin:0 auto;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--accent);background:var(--accent-light);padding:5px 13px;border-radius:100px;margin-bottom:22px;}
+.hero h1{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(38px,5.5vw,72px);font-weight:800;letter-spacing:-2.5px;line-height:1.05;color:var(--text);margin-bottom:18px;}
+.hero h1 em{font-style:normal;color:var(--accent);}
+.hero-sub{font-size:18px;font-weight:400;color:var(--text2);max-width:580px;margin:0 auto 36px;line-height:1.6;}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px;}
+.btn-hero{font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;padding:14px 28px;border-radius:var(--radius);cursor:pointer;border:none;transition:all .2s;display:flex;align-items:center;gap:8px;}
+.btn-hero-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px var(--accent-glow);}
+.btn-hero-primary:hover{background:var(--accent2);transform:translateY(-2px);box-shadow:0 8px 28px var(--accent-glow);}
+.btn-hero-ghost{background:var(--white);color:var(--text);border:1.5px solid var(--border-dark);box-shadow:var(--shadow);}
+.btn-hero-ghost:hover{border-color:var(--accent);color:var(--accent);}
+
+/* ── STATS BAR ── */
+.stats-bar{display:flex;gap:0;justify-content:center;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:0;overflow:hidden;max-width:700px;margin:0 auto 56px;box-shadow:var(--shadow);}
+.stat-item{flex:1;text-align:center;padding:18px 12px;border-right:1px solid var(--border);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-size:26px;font-weight:800;letter-spacing:-1px;color:var(--text);}
+.stat-lbl{font-size:11px;font-weight:500;color:var(--text3);letter-spacing:.3px;text-transform:uppercase;margin-top:3px;}
+
+/* ── TOOL SECTION ── */
+section{max-width:1200px;margin:0 auto;padding:0 40px;}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.section-title{font-family:'Bricolage Grotesque',sans-serif;font-size:clamp(28px,3.5vw,44px);font-weight:800;letter-spacing:-1.5px;line-height:1.1;color:var(--text);margin-bottom:14px;}
+.section-sub{font-size:16px;color:var(--text2);line-height:1.6;max-width:540px;margin-bottom:40px;}
+
+/* ── UPLOAD PANEL (the main app) ── */
+.app-panel{background:var(--white);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:80px;}
+
+/* Tool tabs */
+.tool-tabs{display:flex;overflow-x:auto;border-bottom:1px solid var(--border);padding:0 24px;gap:0;scrollbar-width:none;}
+.tool-tabs::-webkit-scrollbar{display:none;}
+.tool-tab{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:14px 16px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2.5px solid transparent;transition:all .18s;white-space:nowrap;}
+.tool-tab:hover{color:var(--text);}
+.tool-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tool-tab-icon{font-size:15px;}
+
+/* App body */
+.app-body{display:grid;grid-template-columns:1fr 420px;min-height:540px;}
+@media(max-width:900px){.app-body{grid-template-columns:1fr;}}
+
+/* Preview area */
+.preview-area{padding:28px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:16px;background:var(--bg);}
+.preview-box{flex:1;background:var(--white);border:1.5px dashed var(--border-dark);border-radius:var(--radius);min-height:360px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;cursor:pointer;transition:all .2s;}
+.preview-box:hover{border-color:var(--accent);background:var(--accent-light);}
+.preview-box.has-file{cursor:default;border-style:solid;background:var(--bg);}
+.preview-box.has-file:hover{border-color:var(--border-dark);background:var(--bg);}
+.drop-hint{text-align:center;pointer-events:none;}
+.drop-hint-icon{width:64px;height:64px;background:var(--accent-light);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;}
+.drop-hint h3{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.drop-hint p{font-size:13px;color:var(--text3);line-height:1.5;}
+.drop-hint .fmt-chips{display:flex;gap:5px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.fmt-chip{font-size:10px;font-weight:600;letter-spacing:.5px;padding:3px 8px;border-radius:100px;background:var(--bg2);color:var(--text3);}
+
+/* Comparison slider */
+.cmp-wrap{position:relative;width:100%;height:100%;min-height:360px;overflow:hidden;border-radius:calc(var(--radius) - 2px);cursor:col-resize;user-select:none;}
+.cmp-wrap canvas,.cmp-wrap video{display:block;width:100%;height:100%;object-fit:contain;max-height:420px;}
+.cmp-after{position:absolute;top:0;left:0;height:100%;width:50%;overflow:hidden;}
+.cmp-after canvas,.cmp-after video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;}
+.cmp-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#fff;transform:translateX(-50%);z-index:10;pointer-events:none;box-shadow:0 0 8px rgba(0,0,0,.3);}
+.cmp-knob{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38px;height:38px;border-radius:50%;background:#fff;z-index:11;pointer-events:none;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.2);font-size:14px;color:var(--text);}
+.cmp-lbl{position:absolute;bottom:12px;font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:100px;z-index:5;text-transform:uppercase;}
+.lbl-before{left:12px;background:rgba(0,0,0,.55);color:#fff;}
+.lbl-after{right:12px;background:rgba(124,58,237,.8);color:#fff;}
+video#mainVideo{display:block;width:100%;border-radius:var(--radius);background:#000;}
+
+/* Preview toolbar */
+.preview-toolbar{display:flex;gap:8px;align-items:center;}
+.preview-toolbar .tool-btn{font-size:12px;font-weight:600;padding:7px 13px;border-radius:var(--radius-xs);border:1.5px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px;}
+.preview-toolbar .tool-btn:hover{border-color:var(--accent);color:var(--accent);}
+.preview-toolbar .tool-btn.primary{background:var(--accent);color:#fff;border-color:transparent;box-shadow:0 2px 8px var(--accent-glow);}
+.preview-toolbar .tool-btn.primary:hover{background:var(--accent2);}
+
+/* ── SIDEBAR CONTROLS ── */
+.sidebar{padding:24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
+
+.ctrl-section{display:flex;flex-direction:column;gap:10px;}
+.ctrl-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);}
+.ctrl-title-row{display:flex;align-items:center;justify-content:space-between;}
+
+/* Enhancement mode cards */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.mode-card{padding:11px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;text-align:center;}
+.mode-card:hover{border-color:var(--border-dark);}
+.mode-card.active{border-color:var(--accent);background:var(--accent-light);}
+.mode-card-icon{font-size:20px;margin-bottom:5px;display:block;}
+.mode-card-name{font-size:11px;font-weight:600;color:var(--text2);line-height:1.2;}
+.mode-card.active .mode-card-name{color:var(--accent);}
+
+/* Presets */
+.preset-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.preset-chip{font-size:12px;font-weight:600;padding:6px 12px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer;transition:all .18s;}
+.preset-chip:hover{border-color:var(--accent);color:var(--accent);}
+.preset-chip.active{background:var(--accent);color:#fff;border-color:transparent;}
+
+/* Resolution */
+.res-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.res-btn{padding:10px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;text-align:center;}
+.res-btn:hover{border-color:var(--border-dark);}
+.res-btn.active{border-color:var(--accent);background:var(--accent-light);}
+.res-val{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--text);}
+.res-btn.active .res-val{color:var(--accent);}
+.res-sub{font-size:10px;color:var(--text3);margin-top:1px;}
+
+/* FPS */
+.fps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.fps-btn{padding:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;text-align:center;font-size:12px;font-weight:600;color:var(--text2);transition:all .18s;}
+.fps-btn:hover{border-color:var(--border-dark);}
+.fps-btn.active{border-color:var(--green);background:#ecfdf5;color:var(--green);}
+
+/* Sliders */
+.slider-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.slider-lbl{font-size:13px;font-weight:500;color:var(--text);}
+.slider-val{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-light);padding:2px 8px;border-radius:100px;}
+input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:100px;background:var(--bg2);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(124,58,237,.4);transition:transform .15s;}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
+
+/* Auto analyze */
+.auto-card{background:linear-gradient(135deg,var(--accent-light),#f5f3ff);border:1.5px solid rgba(124,58,237,.2);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;}
+.auto-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.auto-card-title{font-size:14px;font-weight:700;color:var(--text);}
+.auto-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent);background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.2);padding:3px 8px;border-radius:100px;}
+.auto-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:13px;}
+/* Analysis metrics */
+.ana-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+.ana-item{background:rgba(255,255,255,.7);border-radius:var(--radius-xs);padding:8px 9px;border:1px solid rgba(124,58,237,.1);}
+.ana-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin-bottom:4px;}
+.ana-bar-wrap{height:3px;background:var(--bg2);border-radius:100px;overflow:hidden;margin-bottom:3px;}
+.ana-bar-fill{height:100%;border-radius:100px;width:0%;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.ana-bar-fill.c1{background:#7c3aed;}
+.ana-bar-fill.c2{background:#059669;}
+.ana-bar-fill.c3{background:#d97706;}
+.ana-bar-fill.c4{background:#dc2626;}
+.ana-bar-fill.c5{background:#0284c7;}
+.ana-bar-fill.c6{background:#9333ea;}
+.ana-row2{display:flex;justify-content:space-between;}
+.ana-v{font-size:11px;font-weight:600;color:var(--text);}
+.ana-n{font-size:9px;color:var(--text3);}
+.btn-analyze{width:100%;padding:11px;background:rgba(124,58,237,.1);color:var(--accent);border:1.5px solid rgba(124,58,237,.3);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden;}
+.btn-analyze:hover{background:rgba(124,58,237,.18);}
+.btn-apply{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s;margin-top:7px;display:none;align-items:center;justify-content:center;gap:7px;box-shadow:0 3px 12px var(--accent-glow);}
+.btn-apply:hover{background:var(--accent2);transform:translateY(-1px);}
+.btn-apply.show{display:flex;}
+
+/* Enhance button */
+.btn-enhance{width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;box-shadow:0 4px 16px var(--accent-glow);}
+.btn-enhance:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 24px var(--accent-glow);}
+.btn-enhance:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+.btn-enhance.processing{background:#6b7280;}
+
+/* Progress */
+.progress-wrap{display:none;}
+.progress-wrap.show{display:flex;flex-direction:column;gap:6px;}
+.prog-track{height:4px;background:var(--bg2);border-radius:100px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .25s;width:0%;box-shadow:0 0 8px var(--accent-glow);}
+.prog-label{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:6px;}
+.prog-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pdot 1.3s infinite;}
+@keyframes pdot{0%,100%{opacity:1;}50%{opacity:.2;}}
+
+/* Divider */
+.ctrl-divider{height:1px;background:var(--border);margin:0 -24px;}
+
+/* Download area */
+.dl-area{display:none;padding:14px;background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:var(--radius-sm);}
+.dl-area.show{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.dl-info{font-size:12px;font-weight:600;color:var(--green);}
+.dl-info p{font-size:11px;font-weight:400;color:var(--text2);margin-top:2px;}
+.btn-dl{font-size:13px;font-weight:600;padding:9px 16px;border-radius:var(--radius-sm);background:var(--green);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .18s;text-decoration:none;flex-shrink:0;}
+.btn-dl:hover{background:#047857;}
+
+/* FFmpeg status */
+.ffmpeg-status{font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;padding:5px 10px;border-radius:100px;border:1px solid var(--border);}
+.ffmpeg-status.ready{color:var(--green);border-color:#6ee7b7;background:#ecfdf5;}
+.ffmpeg-status.loading{color:var(--orange);border-color:#fcd34d;background:#fffbeb;}
+.ffmpeg-status.idle{color:var(--text3);border-color:var(--border);background:var(--bg);}
+.ff-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.ff-dot.pulse{animation:pdot 1s infinite;}
+
+/* ── TOOLS GRID ── */
+.tools-section{padding:72px 40px;background:var(--white);border-top:1px solid var(--border);}
+.tools-inner{max-width:1200px;margin:0 auto;}
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:40px;}
+.tool-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.tool-card::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.04),transparent);opacity:0;transition:opacity .22s;}
+.tool-card:hover{border-color:rgba(124,58,237,.3);box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.tool-card:hover::after{opacity:1;}
+.tc-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;}
+.tc-title{font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.tc-desc{font-size:13px;color:var(--text2);line-height:1.5;}
+.tc-badge{display:inline-flex;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:100px;margin-top:12px;}
+.tc-badge.purple{background:var(--accent-light);color:var(--accent);}
+.tc-badge.green{background:#ecfdf5;color:var(--green);}
+
+/* ── HOW IT WORKS ── */
+.how-section{padding:72px 40px;background:var(--bg);}
+.how-inner{max-width:1200px;margin:0 auto;}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px;}
+@media(max-width:700px){.how-steps{grid-template-columns:1fr;}}
+.how-step{text-align:center;}
+.step-num{width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 4px 16px var(--accent-glow);}
+.step-title{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;}
+.step-desc{font-size:14px;color:var(--text2);line-height:1.6;}
+
+/* ── TESTIMONIALS ── */
+.review-section{padding:72px 40px;background:var(--white);border-top:1px solid var(--border);}
+.review-inner{max-width:1200px;margin:0 auto;}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:40px;}
+.review-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;}
+.review-stars{color:#f59e0b;font-size:13px;margin-bottom:10px;letter-spacing:1px;}
+.review-text{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;font-style:italic;}
+.review-author{font-size:12px;font-weight:600;color:var(--text);}
+.review-platform{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* ── FOOTER ── */
+footer{background:var(--text);color:rgba(255,255,255,.6);padding:40px;text-align:center;}
+footer .f-logo{font-family:'Bricolage Grotesque',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;}
+footer p{font-size:13px;}
+
+/* ── UTILS ── */
+@keyframes shimmer{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+.shimmer{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);animation:shimmer 1.4s infinite;}
+.hidden{display:none!important;}
+@keyframes scanline{0%{top:-5%;}100%{top:105%;}}
+.scan-ovl{position:absolute;inset:0;z-index:20;pointer-events:none;overflow:hidden;border-radius:calc(var(--radius) - 2px);}
+.scan-ovl::after{content:'';position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scanline .7s linear infinite;box-shadow:0 0 10px var(--accent);}
+.scan-ovl.hidden{display:none!important;}
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--text);color:#fff;border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;animation:tIn .3s ease;max-width:300px;box-shadow:var(--shadow-lg);}
+.toast.success{background:#065f46;border:1px solid #6ee7b7;}
+.toast.error{background:#7f1d1d;border:1px solid #fca5a5;}
+@keyframes tIn{from{transform:translateY(12px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-mark">✦</div>
+      <span class="nav-logo-name">Lumina</span>
+    </a>
+    <div class="nav-links">
+      <div class="nav-dropdown">
+        <div class="nav-link" style="display:flex;align-items:center;gap:4px;">Enhance ▾</div>
+        <div class="nav-dropdown-menu">
+          <a class="nd-item" href="#" onclick="activateTool('sharpen')"><div class="nd-icon" style="background:#ede9fe">🔍</div> Unblur & Sharpener</a>
+          <a class="nd-item" href="#" onclick="activateTool('denoise')"><div class="nd-icon" style="background:#ecfdf5">🎛</div> Denoiser</a>
+          <a class="nd-item" href="#" onclick="activateTool('restore')"><div class="nd-icon" style="background:#fff7ed">🖼</div> Old Photo Restorer</a>
+          <a class="nd-item" href="#" onclick="activateTool('enlarge')"><div class="nd-icon" style="background:#eff6ff">🔎</div> Image Enlarger</a>
+          <a class="nd-item" href="#" onclick="activateTool('color')"><div class="nd-icon" style="background:#fdf4ff">🎨</div> Color Fixer</a>
+          <a class="nd-item" href="#" onclick="activateTool('face')"><div class="nd-icon" style="background:#fef2f2">👤</div> Face Enhancer</a>
+          <a class="nd-item" href="#" onclick="activateTool('bg')"><div class="nd-icon" style="background:#f0fdf4">🏔</div> Background Enhancer</a>
+          <a class="nd-item" href="#" onclick="activateTool('video')"><div class="nd-icon" style="background:#f0f9ff">🎬</div> Video Enhancer</a>
+        </div>
+      </div>
+      <a class="nav-link" href="#tools">Tools</a>
+      <a class="nav-link" href="#reviews">Reviews</a>
+    </div>
+    <div class="nav-right">
+      <div class="ffmpeg-status idle" id="ffmpegStatus">
+        <div class="ff-dot"></div>FFmpeg
+      </div>
+      <button class="btn-ghost" onclick="scrollToApp()">Try Free</button>
+      <button class="btn-primary" onclick="scrollToApp()">Get Started ↗</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">✦ AI-Powered Enhancement</div>
+    <h1>The only photo &amp; video<br/>enhancer you'll <em>ever need</em></h1>
+    <p class="hero-sub">Transformative AI gives your low-quality visuals a stunning HD upgrade. Restore old photos and elevate your content to a professional level — instantly.</p>
+    <div class="hero-actions">
+      <button class="btn-hero btn-hero-primary" onclick="scrollToApp()">✨ Enhance for Free</button>
+      <button class="btn-hero btn-hero-ghost" onclick="scrollToApp()">▶ See How It Works</button>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-num">100M+</div><div class="stat-lbl">Monthly Users</div></div>
+      <div class="stat-item"><div class="stat-num">15M+</div><div class="stat-lbl">Downloads/Month</div></div>
+      <div class="stat-item"><div class="stat-num">5B+</div><div class="stat-lbl">Enhanced Files</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div style="max-width:1200px;margin:0 auto;padding:0 40px;" id="app">
+  <div class="app-panel">
+
+    <!-- Tool Tabs -->
+    <div class="tool-tabs" id="toolTabs">
+      <div class="tool-tab active" data-tool="sharpen" onclick="activateTab(this,'sharpen')"><span class="tool-tab-icon">🔍</span> Unblur & Sharpen</div>
+      <div class="tool-tab" data-tool="denoise" onclick="activateTab(this,'denoise')"><span class="tool-tab-icon">🎛</span> Denoiser</div>
+      <div class="tool-tab" data-tool="restore" onclick="activateTab(this,'restore')"><span class="tool-tab-icon">🖼</span> Old Photo</div>
+      <div class="tool-tab" data-tool="enlarge" onclick="activateTab(this,'enlarge')"><span class="tool-tab-icon">🔎</span> Enlarger</div>
+      <div class="tool-tab" data-tool="color" onclick="activateTab(this,'color')"><span class="tool-tab-icon">🎨</span> Color Fix</div>
+      <div class="tool-tab" data-tool="face" onclick="activateTab(this,'face')"><span class="tool-tab-icon">👤</span> Face Enhance</div>
+      <div class="tool-tab" data-tool="bg" onclick="activateTab(this,'bg')"><span class="tool-tab-icon">🏔</span> Background</div>
+      <div class="tool-tab" data-tool="video" onclick="activateTab(this,'video')"><span class="tool-tab-icon">🎬</span> Video</div>
+    </div>
+
+    <div class="app-body">
+      <!-- Preview area -->
+      <div class="preview-area">
+        <div class="preview-box" id="previewBox" onclick="triggerUpload()">
+          <div class="drop-hint" id="dropHint">
+            <div class="drop-hint-icon">⬆</div>
+            <h3>Upload your file</h3>
+            <p>Drag & drop or click to browse<br/>Photos and videos supported</p>
+            <div class="fmt-chips">
+              <span class="fmt-chip">JPG</span><span class="fmt-chip">PNG</span>
+              <span class="fmt-chip">WEBP</span><span class="fmt-chip">MP4</span>
+              <span class="fmt-chip">MOV</span>
+            </div>
+          </div>
+          <!-- Comparison -->
+          <div class="cmp-wrap hidden" id="cmpWrap">
+            <canvas id="canvasBefore"></canvas>
+            <div class="cmp-after" id="cmpAfter">
+              <canvas id="canvasAfter"></canvas>
+            </div>
+            <div class="cmp-line" id="cmpLine"></div>
+            <div class="cmp-knob" id="cmpKnob">⟺</div>
+            <div class="cmp-lbl lbl-before">Original</div>
+            <div class="cmp-lbl lbl-after">Enhanced</div>
+          </div>
+          <!-- Video -->
+          <video id="mainVideo" class="hidden" controls></video>
+          <!-- Scan overlay -->
+          <div class="scan-ovl hidden" id="scanOvl"></div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFileChange(this.files[0])"/>
+
+        <div class="preview-toolbar">
+          <button class="tool-btn" onclick="triggerUpload()">📂 Upload New</button>
+          <button class="tool-btn" id="btnReanalyze" style="display:none" onclick="runAnalyze()">🔍 Analyze</button>
+          <button class="tool-btn primary" id="btnEnhance" onclick="processFile()" style="margin-left:auto;">✨ Enhance</button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+
+        <!-- Auto Adjust -->
+        <div class="auto-card">
+          <div class="auto-card-head">
+            <span class="auto-card-title">✦ Auto Adjust</span>
+            <span class="auto-badge">AI Powered</span>
+          </div>
+          <div class="auto-desc" id="autoDesc">Upload a photo or video to analyze and automatically set the ideal enhancement parameters.</div>
+          <div class="ana-grid" id="anaGrid" style="display:none">
+            <div class="ana-item"><div class="ana-lbl">Brightness</div><div class="ana-bar-wrap"><div class="ana-bar-fill c1" id="ab-brightness"></div></div><div class="ana-row2"><span class="ana-v" id="av-brightness">—</span><span class="ana-n" id="an-brightness">—</span></div></div>
+            <div class="ana-item"><div class="ana-lbl">Contrast</div><div class="ana-bar-wrap"><div class="ana-bar-fill c2" id="ab-contrast"></div></div><div class="ana-row2"><span class="ana-v" id="av-contrast">—</span><span class="ana-n" id="an-contrast">—</span></div></div>
+            <div class="ana-item"><div class="ana-lbl">Saturation</div><div class="ana-bar-wrap"><div class="ana-bar-fill c3" id="ab-saturation"></div></div><div class="ana-row2"><span class="ana-v" id="av-saturation">—</span><span class="ana-n" id="an-saturation">—</span></div></div>
+            <div class="ana-item"><div class="ana-lbl">Noise</div><div class="ana-bar-wrap"><div class="ana-bar-fill c4" id="ab-noise"></div></div><div class="ana-row2"><span class="ana-v" id="av-noise">—</span><span class="ana-n" id="an-noise">—</span></div></div>
+            <div class="ana-item"><div class="ana-lbl">Sharpness</div><div class="ana-bar-wrap"><div class="ana-bar-fill c5" id="ab-sharpness"></div></div><div class="ana-row2"><span class="ana-v" id="av-sharpness">—</span><span class="ana-n" id="an-sharpness">—</span></div></div>
+            <div class="ana-item"><div class="ana-lbl">White Bal.</div><div class="ana-bar-wrap"><div class="ana-bar-fill c6" id="ab-wb"></div></div><div class="ana-row2"><span class="ana-v" id="av-wb">—</span><span class="ana-n" id="an-wb">—</span></div></div>
+          </div>
+          <button class="btn-analyze" id="btnAnalyze" onclick="runAnalyze()">🔍 Analyze File</button>
+          <button class="btn-apply" id="btnApply" onclick="applyAutoSettings()">✦ Apply Smart Corrections</button>
+        </div>
+
+        <!-- Presets -->
+        <div class="ctrl-section">
+          <div class="ctrl-title-row"><span class="ctrl-title">iPhone 17 Style Presets</span></div>
+          <div class="preset-chips">
+            <div class="preset-chip active" id="pc-auto" onclick="applyPreset('auto',this)">Auto</div>
+            <div class="preset-chip" id="pc-photo" onclick="applyPreset('photo',this)">Photogenic</div>
+            <div class="preset-chip" id="pc-cinema" onclick="applyPreset('cinema',this)">Cinematic</div>
+            <div class="preset-chip" id="pc-action" onclick="applyPreset('action',this)">Action</div>
+            <div class="preset-chip" id="pc-night" onclick="applyPreset('night',this)">Night</div>
+          </div>
+        </div>
+
+        <div class="ctrl-divider"></div>
+
+        <!-- Resolution -->
+        <div class="ctrl-section">
+          <div class="ctrl-title">Output Resolution</div>
+          <div class="res-row">
+            <div class="res-btn active" id="rb-1080p" onclick="setRes('1080p',this)"><div class="res-val">1080p</div><div class="res-sub">1920×1080</div></div>
+            <div class="res-btn" id="rb-2k" onclick="setRes('2k',this)"><div class="res-val">2K</div><div class="res-sub">2560×1440</div></div>
+          </div>
+        </div>
+
+        <!-- FPS (video) -->
+        <div class="ctrl-section" id="fpsSec" style="display:none">
+          <div class="ctrl-title">Frame Rate</div>
+          <div class="fps-row">
+            <div class="fps-btn" onclick="setFPS(30,this)">30 fps</div>
+            <div class="fps-btn" onclick="setFPS(60,this)">60 fps</div>
+            <div class="fps-btn active" onclick="setFPS(120,this)">120 fps</div>
+          </div>
+        </div>
+
+        <div class="ctrl-divider"></div>
+
+        <!-- Sliders -->
+        <div class="ctrl-section">
+          <div class="ctrl-title">Fine Tune</div>
+          <div class="slider-row"><span class="slider-lbl">Sharpness</span><span class="slider-val" id="vSharp">80%</span></div>
+          <input type="range" id="sSharp" min="0" max="100" value="80" oninput="sv('vSharp',this.value+'%')"/>
+          <div class="slider-row" style="margin-top:12px"><span class="slider-lbl">Clarity / Denoise</span><span class="slider-val" id="vClarity">60%</span></div>
+          <input type="range" id="sClarity" min="0" max="100" value="60" oninput="sv('vClarity',this.value+'%')"/>
+          <div class="slider-row" style="margin-top:12px"><span class="slider-lbl">Contrast</span><span class="slider-val" id="vContrast">50%</span></div>
+          <input type="range" id="sContrast" min="0" max="100" value="50" oninput="sv('vContrast',this.value+'%')"/>
+          <div class="slider-row" style="margin-top:12px"><span class="slider-lbl">Saturation</span><span class="slider-val" id="vSat">50%</span></div>
+          <input type="range" id="sSat" min="0" max="100" value="50" oninput="sv('vSat',this.value+'%')"/>
+          <div class="slider-row" style="margin-top:12px"><span class="slider-lbl">Exposure</span><span class="slider-val" id="vExp">50%</span></div>
+          <input type="range" id="sExp" min="0" max="100" value="50" oninput="sv('vExp',this.value+'%')"/>
+          <div class="slider-row" style="margin-top:12px"><span class="slider-lbl">Warmth</span><span class="slider-val" id="vWarm">50%</span></div>
+          <input type="range" id="sWarm" min="0" max="100" value="50" oninput="sv('vWarm',this.value+'%')"/>
+        </div>
+
+        <div class="ctrl-divider"></div>
+
+        <!-- Progress -->
+        <div class="progress-wrap" id="progressWrap">
+          <div class="prog-label"><div class="prog-dot"></div><span id="progLabel">Processing…</span></div>
+          <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+        </div>
+
+        <!-- Enhance button -->
+        <button class="btn-enhance" id="btnEnhanceSide" onclick="processFile()">✨ Enhance Now</button>
+
+        <!-- Download -->
+        <div class="dl-area" id="dlArea">
+          <div class="dl-info">✅ Enhancement complete!<p id="dlInfo">Ready to download</p></div>
+          <a class="btn-dl" id="dlBtn" download="lumina-enhanced.jpg">⬇ Download</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOOLS GRID ── -->
+<div class="tools-section" id="tools">
+  <div class="tools-inner">
+    <div class="section-eyebrow">Our Solutions</div>
+    <div class="section-title">Bye-bye blur 👋 Hello HD</div>
+    <div class="section-sub">Every tool uses AI to analyze and enhance your visuals with stunning results in seconds.</div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="activateTool('sharpen');scrollToApp()">
+        <div class="tc-icon" style="background:#ede9fe">🔍</div>
+        <div class="tc-title">Unblur & Sharpener</div>
+        <div class="tc-desc">Remove motion blur, camera shake, or focus issues. Make images look razor-sharp and crystal clear.</div>
+        <div class="tc-badge purple">Most Popular</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('denoise');scrollToApp()">
+        <div class="tc-icon" style="background:#ecfdf5">🎛</div>
+        <div class="tc-title">Denoiser</div>
+        <div class="tc-desc">Eliminate grain and noise from every pixel. Get a clean, sharp image that captures every detail.</div>
+        <div class="tc-badge green">AI Powered</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('restore');scrollToApp()">
+        <div class="tc-icon" style="background:#fff7ed">🖼</div>
+        <div class="tc-title">Old Photo Restorer</div>
+        <div class="tc-desc">Bring blurred, faded, and damaged photos back to life — clearer and more vibrant than ever before.</div>
+        <div class="tc-badge purple">Heritage</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('enlarge');scrollToApp()">
+        <div class="tc-icon" style="background:#eff6ff">🔎</div>
+        <div class="tc-title">Image Enlarger</div>
+        <div class="tc-desc">Upscale photos to 1080p or 2K without losing quality. Every pixel counts — even when you scale up.</div>
+        <div class="tc-badge green">2× Upscale</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('color');scrollToApp()">
+        <div class="tc-icon" style="background:#fdf4ff">🎨</div>
+        <div class="tc-title">Color Fixer</div>
+        <div class="tc-desc">Bring out the full spectrum of colors. Enhance tones and create natural, vivid, true-to-life images.</div>
+        <div class="tc-badge purple">AI Color</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('face');scrollToApp()">
+        <div class="tc-icon" style="background:#fef2f2">👤</div>
+        <div class="tc-title">Face Enhancer</div>
+        <div class="tc-desc">Elevate portraits with enhanced facial detail and a natural look that captures the essence of your subjects.</div>
+        <div class="tc-badge purple">Portraits</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('bg');scrollToApp()">
+        <div class="tc-icon" style="background:#f0fdf4">🏔</div>
+        <div class="tc-title">Background Enhancer</div>
+        <div class="tc-desc">Increase the quality of every detail in the background. Make landscapes and scenes breathtakingly clear.</div>
+        <div class="tc-badge green">Detail Boost</div>
+      </div>
+      <div class="tool-card" onclick="activateTool('video');scrollToApp()">
+        <div class="tc-icon" style="background:#f0f9ff">🎬</div>
+        <div class="tc-title">Video Enhancer</div>
+        <div class="tc-desc">Upscale to 1080p or 2K, boost to 60/120fps, sharpen every frame. iPhone 17 camera quality from any video.</div>
+        <div class="tc-badge purple">120fps</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<div class="how-section">
+  <div class="how-inner">
+    <div style="text-align:center">
+      <div class="section-eyebrow" style="justify-content:center;display:flex">Simple Process</div>
+      <div class="section-title" style="text-align:center">Three steps to perfection</div>
+    </div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-title">Upload your file</div>
+        <div class="step-desc">Drop in any photo or video — JPG, PNG, WEBP, MP4, MOV. No account needed.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-title">AI analyzes & enhances</div>
+        <div class="step-desc">Our AI scans brightness, noise, sharpness, and color — then applies the perfect corrections.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-title">Download in HD</div>
+        <div class="step-desc">Get your enhanced file at 1080p or 2K resolution. Photos process in milliseconds.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── REVIEWS ── -->
+<div class="review-section" id="reviews">
+  <div class="review-inner">
+    <div class="section-eyebrow">Our Users</div>
+    <div class="section-title">Used by millions worldwide</div>
+    <div class="reviews-grid">
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Never seen such a high-quality app that works right in the browser. Absolutely incredible results in seconds."</div><div class="review-author">Sarah M.</div><div class="review-platform">Web User</div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"I had an old photo of my grandmother and the enhancement is just magic. It's the only photo I had of her young."</div><div class="review-author">James K.</div><div class="review-platform">iOS User</div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Upload, click enhance, perfection. I have not a single complaint. The AI knows exactly what every photo needs."</div><div class="review-author">Priya S.</div><div class="review-platform">Android User</div></div>
+      <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"The video enhancer is insane. 120fps output from my old holiday clips. Looks like it was filmed on the latest phone."</div><div class="review-author">Marco T.</div><div class="review-platform">Web User</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="f-logo">✦ Lumina</div>
+  <p>AI Photo & Video Enhancement Studio · Powered by iPhone 17 Cam Engine · All rights reserved © 2025</p>
+</footer>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let activeTool='sharpen', currentRes='1080p', currentFPS=120, currentPreset='auto';
+let uploadedFile=null, origImgData=null, analysisData=null;
+let ffmpegInst=null, ffmpegReady=false, ffmpegLoading=false;
+let isVideo=false;
+
+const PRESETS={
+  auto:   {sharp:78,clarity:62,contrast:52,sat:54,exp:52,warm:50},
+  photo:  {sharp:82,clarity:70,contrast:58,sat:68,exp:55,warm:58},
+  cinema: {sharp:72,clarity:80,contrast:72,sat:42,exp:45,warm:42},
+  action: {sharp:96,clarity:55,contrast:65,sat:60,exp:52,warm:48},
+  night:  {sharp:65,clarity:90,contrast:48,sat:50,exp:72,warm:56},
+};
+
+// Tool presets — auto-configure sliders per tool
+const TOOL_CONFIGS={
+  sharpen: {sharp:90,clarity:55,contrast:52,sat:52,exp:50,warm:50},
+  denoise: {sharp:55,clarity:92,contrast:50,sat:50,exp:52,warm:50},
+  restore: {sharp:80,clarity:85,contrast:60,sat:65,exp:58,warm:55},
+  enlarge: {sharp:85,clarity:65,contrast:55,sat:55,exp:50,warm:50},
+  color:   {sharp:70,clarity:60,contrast:60,sat:85,exp:52,warm:58},
+  face:    {sharp:88,clarity:70,contrast:56,sat:60,exp:53,warm:55},
+  bg:      {sharp:82,clarity:72,contrast:58,sat:62,exp:50,warm:50},
+  video:   {sharp:80,clarity:65,contrast:55,sat:55,exp:52,warm:50},
+};
+
+// ═══════════════════════════════════════════
+// TOOL TABS / NAV
+// ═══════════════════════════════════════════
+function activateTab(el, tool){
+  document.querySelectorAll('.tool-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  activateTool(tool);
+}
+function activateTool(tool){
+  activeTool=tool;
+  document.querySelectorAll('.tool-tab').forEach(t=>{
+    if(t.dataset.tool===tool) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+  isVideo = tool==='video';
+  document.getElementById('fpsSec').style.display = isVideo?'':'none';
+  const cfg=TOOL_CONFIGS[tool]||PRESETS.auto;
+  ss('sSharp',cfg.sharp,'vSharp',cfg.sharp+'%');
+  ss('sClarity',cfg.clarity,'vClarity',cfg.clarity+'%');
+  ss('sContrast',cfg.contrast,'vContrast',cfg.contrast+'%');
+  ss('sSat',cfg.sat,'vSat',cfg.sat+'%');
+  ss('sExp',cfg.exp,'vExp',cfg.exp+'%');
+  ss('sWarm',cfg.warm,'vWarm',cfg.warm+'%');
+  document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
+  document.getElementById('pc-auto').classList.add('active');
+}
+function scrollToApp(){document.getElementById('app').scrollIntoView({behavior:'smooth'});}
+
+// ═══════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════
+function triggerUpload(){ document.getElementById('fileInput').click(); }
+function handleFileChange(f){ if(f)handleFile(f); }
+
+// Drag and drop on preview box
+const PB=document.getElementById('previewBox');
+PB.addEventListener('dragover',e=>{e.preventDefault();PB.style.borderColor='var(--accent)';});
+PB.addEventListener('dragleave',()=>{if(!uploadedFile)PB.style.borderColor='';});
+PB.addEventListener('drop',e=>{e.preventDefault();PB.style.borderColor='';if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+
+function handleFile(f){
+  uploadedFile=f; analysisData=null;
+  isVideo=f.type.startsWith('video/');
+  document.getElementById('btnApply').classList.remove('show');
+  document.getElementById('anaGrid').style.display='none';
+  document.getElementById('autoDesc').textContent='File loaded — click Analyze to scan and auto-set optimal parameters.';
+  document.getElementById('fpsSec').style.display=isVideo?'':'none';
+  document.getElementById('dlArea').classList.remove('show');
+  document.getElementById('progressWrap').classList.remove('show');
+  document.getElementById('btnReanalyze').style.display='';
+
+  if(!isVideo){
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image(); img.onload=()=>{
+        const bc=document.getElementById('canvasBefore'), ac=document.getElementById('canvasAfter');
+        bc.width=img.width; bc.height=img.height; ac.width=img.width; ac.height=img.height;
+        const ctx=bc.getContext('2d'); ctx.drawImage(img,0,0);
+        ac.getContext('2d').drawImage(img,0,0);
+        origImgData=ctx.getImageData(0,0,img.width,img.height);
+        document.getElementById('dropHint').classList.add('hidden');
+        document.getElementById('cmpWrap').classList.remove('hidden');
+        document.getElementById('mainVideo').classList.add('hidden');
+        PB.classList.add('has-file'); PB.onclick=null;
+        initComparison();
+      }; img.src=ev.target.result;
+    }; reader.readAsDataURL(f);
+  }else{
+    document.getElementById('dropHint').classList.add('hidden');
+    document.getElementById('cmpWrap').classList.add('hidden');
+    const vid=document.getElementById('mainVideo');
+    vid.classList.remove('hidden'); vid.src=URL.createObjectURL(f);
+    PB.classList.add('has-file'); PB.onclick=null;
+    // auto switch to video tab
+    activateTool('video');
+    document.querySelectorAll('.tool-tab').forEach(t=>{
+      t.classList.toggle('active',t.dataset.tool==='video');
+    });
+  }
+  toast('✅ '+f.name+' loaded','success');
+}
+
+// ═══════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════
+function setRes(r,el){
+  currentRes=r;
+  document.querySelectorAll('.res-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function setFPS(f,el){
+  currentFPS=f;
+  document.querySelectorAll('.fps-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function applyPreset(id,el){
+  currentPreset=id;
+  document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const p=PRESETS[id];
+  ss('sSharp',p.sharp,'vSharp',p.sharp+'%'); ss('sClarity',p.clarity,'vClarity',p.clarity+'%');
+  ss('sContrast',p.contrast,'vContrast',p.contrast+'%'); ss('sSat',p.sat,'vSat',p.sat+'%');
+  ss('sExp',p.exp,'vExp',p.exp+'%'); ss('sWarm',p.warm,'vWarm',p.warm+'%');
+  toast('Preset "'+id+'" applied','success');
+}
+function sv(id,v){document.getElementById(id).textContent=v;}
+function ss(sid,v,vid,lbl){document.getElementById(sid).value=v;document.getElementById(vid).textContent=lbl;}
+function gv(id){return parseInt(document.getElementById(id).value)/100;}
+activateTool('sharpen');
+
+// ═══════════════════════════════════════════
+// AUTO ANALYZE
+// ═══════════════════════════════════════════
+async function runAnalyze(){
+  if(!uploadedFile){toast('Upload a file first','error');return;}
+  const btn=document.getElementById('btnAnalyze');
+  btn.innerHTML='<div class="shimmer"></div>🔍 Analyzing…'; btn.disabled=true;
+  document.getElementById('scanOvl').classList.remove('hidden');
+  await sleep(180);
+  let r;
+  if(!isVideo&&origImgData) r=analyzeImg(origImgData);
+  else r=await analyzeVidFrame(uploadedFile);
+  analysisData=r;
+  document.getElementById('scanOvl').classList.add('hidden');
+  document.getElementById('anaGrid').style.display='grid';
+  document.getElementById('autoDesc').textContent='Analysis complete — detected: '+r.summary+'. Apply corrections below.';
+  fillGrid(r);
+  document.getElementById('btnApply').classList.add('show');
+  btn.innerHTML='🔍 Re-Analyze'; btn.disabled=false;
+  toast('Analysis done: '+r.summary,'success');
+}
+
+function analyzeImg(imgData){
+  const d=imgData.data, N=d.length/4, step=Math.max(1,Math.floor(N/8000));
+  let sL=0,sR=0,sG=0,sB=0,lums=[];
+  for(let i=0;i<N;i+=step){const r=d[i*4],g=d[i*4+1],b=d[i*4+2];sR+=r;sG+=g;sB+=b;const l=.299*r+.587*g+.114*b;sL+=l;lums.push(l);}
+  const cnt=lums.length,avgL=sL/cnt,avgR=sR/cnt,avgB_=sB/cnt;
+  let varL=0; for(const l of lums)varL+=(l-avgL)**2; varL/=cnt;
+  const stdDev=Math.sqrt(varL);
+  const w=imgData.width,h=imgData.height,ns=Math.max(1,Math.floor(w/80));
+  let nS=0,nC=0;
+  for(let y=1;y<Math.min(h-1,200);y+=ns)for(let x=1;x<Math.min(w-1,200);x+=ns){
+    const i=(y*w+x)*4,cur=.299*d[i]+.587*d[i+1]+.114*d[i+2],ri=.299*d[i+4]+.587*d[i+5]+.114*d[i+6];
+    nS+=Math.abs(cur-ri);nC++;
+  }
+  const noiseL=Math.min(100,nC>0?(nS/nC)*3:0);
+  let lapS=0,lapC=0;
+  for(let y=1;y<Math.min(h-1,100);y++)for(let x=1;x<Math.min(w-1,100);x++){
+    const ci=(y*w+x)*4,c=.299*d[ci]+.587*d[ci+1]+.114*d[ci+2];
+    const n2=.299*d[((y-1)*w+x)*4]+.587*d[((y-1)*w+x)*4+1]+.114*d[((y-1)*w+x)*4+2];
+    const s2=.299*d[((y+1)*w+x)*4]+.587*d[((y+1)*w+x)*4+1]+.114*d[((y+1)*w+x)*4+2];
+    const e2=.299*d[(y*w+x+1)*4]+.587*d[(y*w+x+1)*4+1]+.114*d[(y*w+x+1)*4+2];
+    const ww=.299*d[(y*w+x-1)*4]+.587*d[(y*w+x-1)*4+1]+.114*d[(y*w+x-1)*4+2];
+    lapS+=Math.abs(4*c-n2-s2-e2-ww);lapC++;
+  }
+  const sharpScore=Math.min(100,lapC>0?(lapS/lapC)*2:50);
+  let satS=0;
+  for(let i=0;i<N;i+=step){const r=d[i*4],g=d[i*4+1],b=d[i*4+2];const mn=Math.min(r,g,b),mx=Math.max(r,g,b);satS+=mx>0?(mx-mn)/mx:0;}
+  const satLevel=(satS/cnt)*100;
+  const wbTemp=Math.min(100,Math.max(0,(avgR/(avgB_+1)-.5)*50+50));
+  const brightness=Math.round(avgL/2.55),contrast=Math.min(100,Math.round(stdDev/1.28)),saturation=Math.round(satLevel),noise=Math.round(noiseL),sharpness=Math.round(sharpScore),wb=Math.round(wbTemp);
+  const recSharp=Math.min(100,Math.max(20,100-sharpness+30)),recClarity=Math.min(100,Math.max(20,noise>50?88:52));
+  const recContrast=Math.min(100,Math.max(10,contrast<30?82:contrast<50?65:50));
+  const recSat=Math.min(100,Math.max(10,saturation<30?82:saturation<55?65:50));
+  const recExp=Math.min(100,Math.max(10,brightness<30?88:brightness>80?32:52));
+  const recWarm=Math.min(100,Math.max(10,wbTemp<35?65:wbTemp>65?38:50));
+  const conds=[];
+  if(brightness<30)conds.push('underexposed');else if(brightness>80)conds.push('overexposed');
+  if(noiseL>40)conds.push('noisy');if(sharpScore<35)conds.push('soft');
+  if(satLevel<25)conds.push('desaturated');if(contrast<25)conds.push('low contrast');
+  return{brightness,contrast,saturation,noise,sharpness,wb,recSharp,recClarity,recContrast,recSat,recExp,recWarm,summary:conds.length?conds.join(', '):'well-balanced'};
+}
+
+async function analyzeVidFrame(f){
+  return new Promise(res=>{
+    const v=document.createElement('video');v.src=URL.createObjectURL(f);v.crossOrigin='anonymous';
+    v.addEventListener('loadeddata',()=>{v.currentTime=0.5;});
+    v.addEventListener('seeked',()=>{
+      const c=document.createElement('canvas');c.width=Math.min(v.videoWidth,640);c.height=Math.min(v.videoHeight,360);
+      c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+      res(analyzeImg(c.getContext('2d').getImageData(0,0,c.width,c.height)));
+    });
+    v.addEventListener('error',()=>res({brightness:50,contrast:50,saturation:50,noise:30,sharpness:50,wb:50,recSharp:78,recClarity:62,recContrast:52,recSat:54,recExp:52,recWarm:50,summary:'default'}));
+    v.load();
+  });
+}
+
+function fillGrid(r){
+  function set(k,v,note,pct){
+    document.getElementById('ab-'+k).style.width=pct+'%';
+    document.getElementById('av-'+k).textContent=v;
+    document.getElementById('an-'+k).textContent=note;
+  }
+  set('brightness',r.brightness+'%',r.brightness<30?'⬇ dark':r.brightness>80?'⬆ bright':'✓',r.brightness);
+  set('contrast',r.contrast+'%',r.contrast<30?'⬇ flat':r.contrast>70?'⬆ high':'✓',r.contrast);
+  set('saturation',r.saturation+'%',r.saturation<25?'⬇ dull':r.saturation>75?'⬆ vivid':'✓',r.saturation);
+  set('noise',r.noise+'%',r.noise>60?'⬆ noisy':r.noise>30?'△':'✓',r.noise);
+  set('sharpness',r.sharpness+'%',r.sharpness<35?'⬇ soft':r.sharpness>75?'✓ sharp':'△',r.sharpness);
+  set('wb',r.wb+'%',r.wb<35?'⬇ cool':r.wb>65?'⬆ warm':'✓',r.wb);
+}
+
+function applyAutoSettings(){
+  if(!analysisData){toast('Analyze first','error');return;}
+  const r=analysisData;
+  ss('sSharp',r.recSharp,'vSharp',r.recSharp+'%');ss('sClarity',r.recClarity,'vClarity',r.recClarity+'%');
+  ss('sContrast',r.recContrast,'vContrast',r.recContrast+'%');ss('sSat',r.recSat,'vSat',r.recSat+'%');
+  ss('sExp',r.recExp,'vExp',r.recExp+'%');ss('sWarm',r.recWarm,'vWarm',r.recWarm+'%');
+  document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
+  toast('✦ Smart corrections applied — click Enhance!','success');
+}
+
+// ═══════════════════════════════════════════
+// IMAGE PROCESSING
+// ═══════════════════════════════════════════
+function processImage(){
+  if(!origImgData){toast('Upload an image first','error');return;}
+  setStatus('Upscaling to '+currentRes+'…');setProgress(10);
+  setTimeout(()=>{
+    const sharp=gv('sSharp'),clarity=gv('sClarity'),contrast=gv('sContrast'),sat=gv('sSat'),exp=gv('sExp'),warm=gv('sWarm');
+    const tw=currentRes==='2k'?2560:1920,th=currentRes==='2k'?1440:1080;
+    const offC=document.createElement('canvas');offC.width=tw;offC.height=th;
+    const oc=offC.getContext('2d',{willReadFrequently:true});
+    const tmp=document.createElement('canvas');tmp.width=origImgData.width;tmp.height=origImgData.height;
+    tmp.getContext('2d').putImageData(origImgData,0,0);
+    oc.imageSmoothingEnabled=true;oc.imageSmoothingQuality='high';oc.drawImage(tmp,0,0,tw,th);
+    setProgress(25);setStatus('Applying exposure & white balance…');
+    let id=oc.getImageData(0,0,tw,th);
+    if(Math.abs(exp-.5)>.04)id=applyExp(id,exp);
+    if(Math.abs(warm-.5)>.04)id=applyWarm(id,warm);
+    setProgress(45);setStatus('Color grading…');
+    if(sat!==.5)id=applySat(id,1+(sat-.5)*1.6);
+    if(contrast>0)id=applyCont(id,1+(contrast*.6));
+    setProgress(65);setStatus('Sharpening…');
+    if(sharp>.08)id=unsharp(id,sharp*2.8);
+    setProgress(82);setStatus('Clarity pass…');
+    if(clarity>.08)id=unsharp(id,clarity*.55);
+    setProgress(94);setStatus('Rendering…');
+    const res2=document.createElement('canvas');res2.width=tw;res2.height=th;res2.getContext('2d').putImageData(id,0,0);
+    const ac=document.getElementById('canvasAfter'),bc=document.getElementById('canvasBefore');
+    ac.width=bc.width;ac.height=bc.height;
+    const ax=ac.getContext('2d');ax.imageSmoothingEnabled=true;ax.imageSmoothingQuality='high';ax.drawImage(res2,0,0,bc.width,bc.height);
+    setProgress(100);setStatus('');
+    res2.toBlob(b=>{
+      const dl=document.getElementById('dlBtn');dl.href=URL.createObjectURL(b);dl.download=`lumina_${currentRes}_${activeTool}.jpg`;
+      document.getElementById('dlInfo').textContent=currentRes.toUpperCase()+' · '+activeTool+' enhanced';
+      document.getElementById('dlArea').classList.add('show');
+    },'image/jpeg',.95);
+    endProcess();
+    toast('✅ Photo enhanced to '+currentRes+'!','success');
+  },40);
+}
+
+// ═══════════════════════════════════════════
+// PIXEL MATH
+// ═══════════════════════════════════════════
+function clamp(v){return Math.max(0,Math.min(255,v));}
+function unsharp(id,amt){
+  const d=id.data,w=id.width,h=id.height,o=new Uint8ClampedArray(d);
+  for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){
+    const i=(y*w+x)*4;
+    for(let c=0;c<3;c++){const n=d[((y-1)*w+x)*4+c],s=d[((y+1)*w+x)*4+c],e=d[(y*w+x+1)*4+c],ww=d[(y*w+x-1)*4+c];o[i+c]=clamp(d[i+c]-amt*(n+s+e+ww-4*d[i+c]));}
+  } return new ImageData(o,w,h);
+}
+function applyCont(id,f){const d=new Uint8ClampedArray(id.data),ic=128*(1-f);for(let i=0;i<d.length;i+=4){d[i]=clamp(d[i]*f+ic);d[i+1]=clamp(d[i+1]*f+ic);d[i+2]=clamp(d[i+2]*f+ic);}return new ImageData(d,id.width,id.height);}
+function applySat(id,f){const d=new Uint8ClampedArray(id.data);for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],gr=.299*r+.587*g+.114*b;d[i]=clamp(gr+(r-gr)*f);d[i+1]=clamp(gr+(g-gr)*f);d[i+2]=clamp(gr+(b-gr)*f);}return new ImageData(d,id.width,id.height);}
+function applyExp(id,e){const d=new Uint8ClampedArray(id.data),f=Math.pow(2,(e-.5)*2.5);for(let i=0;i<d.length;i+=4){d[i]=clamp(d[i]*f);d[i+1]=clamp(d[i+1]*f);d[i+2]=clamp(d[i+2]*f);}return new ImageData(d,id.width,id.height);}
+function applyWarm(id,w){const d=new Uint8ClampedArray(id.data),sh=(w-.5)*40;for(let i=0;i<d.length;i+=4){d[i]=clamp(d[i]+sh);d[i+1]=clamp(d[i+1]+sh*.3);d[i+2]=clamp(d[i+2]-sh);}return new ImageData(d,id.width,id.height);}
+
+// ═══════════════════════════════════════════
+// FFMPEG ENGINE
+// ═══════════════════════════════════════════
+function setFFmpegStatus(state){
+  const el=document.getElementById('ffmpegStatus');
+  const dot=el.querySelector('.ff-dot');
+  el.className='ffmpeg-status '+state;
+  el.innerHTML=`<div class="ff-dot${state==='loading'?' pulse':''}"></div>${state==='ready'?'FFmpeg ✓':state==='loading'?'FFmpeg…':'FFmpeg'}`;
+}
+
+async function getFFmpeg(){
+  if(ffmpegReady)return ffmpegInst;
+  if(ffmpegLoading){while(ffmpegLoading)await sleep(200);return ffmpegInst;}
+  if(!window.FFmpeg)throw new Error('FFmpeg script failed to load. Check internet connection.');
+  ffmpegLoading=true;
+  setFFmpegStatus('loading');
+  try{
+    const{createFFmpeg,fetchFile}=window.FFmpeg;
+    ffmpegInst=createFFmpeg({
+      log:true,
+      progress:({ratio})=>{if(ratio>=0&&ratio<=1)setProgress(20+ratio*72);},
+      corePath:'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+    });
+    setStatus('Loading FFmpeg engine…');
+    await ffmpegInst.load();
+    ffmpegInst._ff=fetchFile;
+    ffmpegReady=true;
+    ffmpegLoading=false;
+    setFFmpegStatus('ready');
+    return ffmpegInst;
+  }catch(e){ffmpegLoading=false;setFFmpegStatus('idle');throw e;}
+}
+
+async function processVideo(){
+  setStatus('Initializing FFmpeg engine…');setProgress(3);
+  try{
+    const ff=await getFFmpeg();
+    const fetchFile=ff._ff;
+    setStatus('Reading video…');setProgress(14);
+    const ext=(uploadedFile.name.split('.').pop()||'mp4').toLowerCase();
+    const inN='input.'+ext, outN=`lumina_${currentRes}_${currentFPS}fps.mp4`;
+    ff.FS('writeFile',inN,await fetchFile(uploadedFile));
+    const tw=currentRes==='2k'?2560:1920,th=currentRes==='2k'?1440:1080;
+    const sharp=gv('sSharp'),expV=gv('sExp'),warm=gv('sWarm'),sat=gv('sSat'),cont=gv('sContrast');
+    const ua=(sharp*2).toFixed(2),satV=(1+(sat-.5)*1.2).toFixed(3),contV=(1+cont*.55).toFixed(3);
+    const brightV=((expV-.5)*.35).toFixed(3),gamR=(1+(warm-.5)*.28).toFixed(3),gamB=(1-(warm-.5)*.28).toFixed(3);
+    setStatus(`Encoding to ${currentRes} @ ${currentFPS}fps…`);
+    const vf=[`scale=${tw}:${th}:flags=lanczos`,`unsharp=luma_msize_x=5:luma_msize_y=5:luma_amount=${ua}:chroma_msize_x=3:chroma_msize_y=3:chroma_amount=0.5`,`eq=contrast=${contV}:saturation=${satV}:brightness=${brightV}:gamma_r=${gamR}:gamma_b=${gamB}`,`fps=${currentFPS}`].join(',');
+    await ff.run('-i',inN,'-vf',vf,'-c:v','libx264','-crf','16','-preset','fast','-profile:v','high','-level','4.2','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k','-movflags','+faststart',outN);
+    setStatus('Packaging output…');setProgress(96);
+    const data=ff.FS('readFile',outN);
+    const blob=new Blob([data.buffer],{type:'video/mp4'}),url=URL.createObjectURL(blob);
+    try{ff.FS('unlink',inN);ff.FS('unlink',outN);}catch(_){}
+    const vid=document.getElementById('mainVideo');vid.src=url;vid.classList.remove('hidden');
+    const dl=document.getElementById('dlBtn');dl.href=url;dl.download=outN;
+    document.getElementById('dlInfo').textContent=currentRes.toUpperCase()+' · '+currentFPS+'fps · H.264';
+    document.getElementById('dlArea').classList.add('show');
+    setProgress(100);setStatus('');
+    endProcess();toast(`✅ Video: ${currentRes} @ ${currentFPS}fps`,'success');
+  }catch(err){console.error(err);setStatus('');endProcess();toast('⚠️ '+err.message,'error');}
+}
+
+// ═══════════════════════════════════════════
+// DISPATCH
+// ═══════════════════════════════════════════
+function processFile(){
+  if(!uploadedFile){toast('Upload a file first!','error');return;}
+  startProcess();
+  if(isVideo)processVideo();else processImage();
+}
+
+// ═══════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════
+function startProcess(){
+  const b1=document.getElementById('btnEnhanceSide');
+  b1.disabled=true;b1.classList.add('processing');b1.innerHTML='<div class="shimmer"></div>⏳ Processing…';
+  document.getElementById('progressWrap').classList.add('show');
+  document.getElementById('dlArea').classList.remove('show');
+}
+function endProcess(){
+  const b1=document.getElementById('btnEnhanceSide');
+  b1.disabled=false;b1.classList.remove('processing');b1.innerHTML='✨ Enhance Again';
+}
+function setProgress(p){document.getElementById('progFill').style.width=p+'%';}
+function setStatus(msg){document.getElementById('progLabel').textContent=msg||'Done';}
+function toast(msg,type=''){
+  const w=document.getElementById('toastWrap');
+  const el=document.createElement('div');el.className='toast '+type;el.textContent=msg;
+  w.appendChild(el);setTimeout(()=>el.remove(),4000);
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+// ═══════════════════════════════════════════
+// COMPARISON SLIDER
+// ═══════════════════════════════════════════
+function initComparison(){
+  const wrap=document.getElementById('cmpWrap'),after=document.getElementById('cmpAfter'),line=document.getElementById('cmpLine'),knob=document.getElementById('cmpKnob');
+  let drag=false;
+  const sp=x=>{const r=wrap.getBoundingClientRect(),p=Math.max(2,Math.min(98,(x-r.left)/r.width*100));after.style.width=p+'%';line.style.left=p+'%';knob.style.left=p+'%';};
+  wrap.addEventListener('mousedown',e=>{drag=true;sp(e.clientX);});
+  wrap.addEventListener('touchstart',e=>{drag=true;sp(e.touches[0].clientX);});
+  window.addEventListener('mousemove',e=>{if(drag)sp(e.clientX);});
+  window.addEventListener('touchmove',e=>{if(drag)sp(e.touches[0].clientX);});
+  window.addEventListener('mouseup',()=>drag=false);
+  window.addEventListener('touchend',()=>drag=false);
+}
+
+// Pre-warm FFmpeg on load
+window.addEventListener('load',()=>{
+  setTimeout(async()=>{
+    if(window.FFmpeg){
+      setFFmpegStatus('loading');
+      try{await getFFmpeg();}catch(e){setFFmpegStatus('idle');console.warn('FFmpeg pre-warm:',e);}
+    }
+  },2500);
+});
+</script>
+</body>
+</html>
